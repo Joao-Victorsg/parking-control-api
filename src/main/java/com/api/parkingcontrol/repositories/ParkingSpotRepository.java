@@ -1,0 +1,23 @@
+package com.api.parkingcontrol.repositories;
+
+import com.api.parkingcontrol.models.ParkingSpotModel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface ParkingSpotRepository extends JpaRepository<ParkingSpotModel, UUID> {
+
+//Extending the JpaRepository already brings the basic methods for doing queries in the db, like
+//findByID, findAll, select, etc.
+
+//At first, it isn't obligatory to put the @Repository annotation, because the JpaRepository already has it,
+// and as ParkingSpotRepository is extending this class, it automatically gains the annotation. But as learning
+// purpose I will put it there.
+
+    boolean existsByLicensePlateCar(String licensePlateCar);
+    boolean existsByParkingSpotNumber(String parkingSpotNumber);
+    boolean existsByApartmentAndBlock(String apartment, String block);
+
+}
