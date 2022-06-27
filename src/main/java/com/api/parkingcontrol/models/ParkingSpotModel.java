@@ -24,14 +24,9 @@ public class ParkingSpotModel implements Serializable {
 
     @Column(nullable = false, unique = true, length = 10)
     private String parkingSpotNumber;
-    @Column(nullable = false, unique = true, length = 7)
-    private String licensePlateCar;
-    @Column(nullable = false,length = 70)
-    private String brandCar;
-    @Column(nullable = false,length = 70)
-    private String modelCar;
-    @Column(nullable = false,length = 70)
-    private String colorCar;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "carmodel_id", referencedColumnName = "id")
+    private CarModel carModel;
     @Column(nullable = false)
     private LocalDateTime registrationDate;
     @Column(nullable = false, length = 130)

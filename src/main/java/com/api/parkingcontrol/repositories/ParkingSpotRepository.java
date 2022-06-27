@@ -16,7 +16,6 @@ public interface ParkingSpotRepository extends JpaRepository<ParkingSpotModel, U
 // and as ParkingSpotRepository is extending this class, it automatically gains the annotation. But as learning
 // purpose I will put it there.
 
-    boolean existsByLicensePlateCar(String licensePlateCar);
     boolean existsByParkingSpotNumber(String parkingSpotNumber);
     boolean existsByApartmentAndBlock(String apartment, String block);
 

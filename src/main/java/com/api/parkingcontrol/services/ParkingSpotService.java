@@ -1,13 +1,13 @@
 package com.api.parkingcontrol.services;
 
 import com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.repositories.CarModelRepository;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,9 +17,11 @@ public class ParkingSpotService {
     // Controller -> Service -> Repository
 
     final ParkingSpotRepository parkingSpotRepository;
+    final CarModelRepository carModelRepository;
 
-    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository) {
+    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository, CarModelRepository carModelRepository) {
         this.parkingSpotRepository = parkingSpotRepository;
+        this.carModelRepository = carModelRepository;
     }
 
     @Transactional
@@ -28,7 +30,7 @@ public class ParkingSpotService {
     }
 
     public boolean existsByLicensePlateCar(String licensePlateCar) {
-        return parkingSpotRepository.existsByLicensePlateCar(licensePlateCar);
+        return carModelRepository.existsByLicensePlateCar(licensePlateCar);
     }
 
     public boolean existsByParkingSpotNumber(String parkingSpotNumber) {
