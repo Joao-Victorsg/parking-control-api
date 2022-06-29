@@ -1,5 +1,6 @@
 package com.api.parkingcontrol.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,9 +9,10 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "TB_CARMODEL")
 @Getter
 @Setter
+@Table(name = "TB_CARMODEL")
+@Data
 public class CarModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -26,7 +28,4 @@ public class CarModel implements Serializable {
     private String modelCar;
     @Column(nullable = false,length = 70)
     private String colorCar;
-    @OneToOne(mappedBy = "carModel")
-    private ParkingSpotModel parkingSpotModel;
-
 }
