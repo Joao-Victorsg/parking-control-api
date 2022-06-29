@@ -3,6 +3,7 @@ package com.api.parkingcontrol.services;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.repositories.CarModelRepository;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
+import com.api.parkingcontrol.repositories.ResponsibleModelRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,13 @@ public class ParkingSpotService {
 
     final ParkingSpotRepository parkingSpotRepository;
     final CarModelRepository carModelRepository;
+    final ResponsibleModelRepository responsibleModelRepository;
 
-    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository, CarModelRepository carModelRepository) {
+    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository, CarModelRepository carModelRepository,
+                              ResponsibleModelRepository responsibleModelRepository) {
         this.parkingSpotRepository = parkingSpotRepository;
         this.carModelRepository = carModelRepository;
+        this.responsibleModelRepository = responsibleModelRepository;
     }
 
     @Transactional
@@ -37,9 +41,8 @@ public class ParkingSpotService {
         return parkingSpotRepository.existsByParkingSpotNumber(parkingSpotNumber);
     }
 
-
     public boolean existsByApartmentAndBlock(String apartment, String block) {
-        return parkingSpotRepository.existsByApartmentAndBlock(apartment,block);
+        return responsibleModelRepository.existsByApartmentAndBlock(apartment,block);
     }
 
     public Page<ParkingSpotModel> findall(Pageable pageable) {

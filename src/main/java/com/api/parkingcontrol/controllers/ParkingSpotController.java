@@ -3,6 +3,7 @@ package com.api.parkingcontrol.controllers;
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.models.CarModel;
 import com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.models.ResponsibleModel;
 import com.api.parkingcontrol.services.ParkingSpotService;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.BeanUtils;
@@ -43,10 +44,13 @@ public class ParkingSpotController {
 
         var parkingSpotModel = new ParkingSpotModel();
         var carModel = new CarModel();
+        var responsibleModel = new ResponsibleModel();
 
         BeanUtils.copyProperties(parkingSpotDto, carModel);
+        BeanUtils.copyProperties(parkingSpotDto, responsibleModel);
         BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel); //Converting the DTO in Model
         parkingSpotModel.setCarModel(carModel);
+        parkingSpotModel.setResponsibleModel(responsibleModel);
 
         parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
         return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
@@ -97,6 +101,9 @@ public class ParkingSpotController {
 
         var parkingSpotModel = parkingSpotModelOptional.get();
         BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel);
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel.getCarModel());
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel.getResponsibleModel());
+
         parkingSpotModel.setId(parkingSpotModelOptional.get().getId());
         parkingSpotModel.setRegistrationDate(parkingSpotModelOptional.get().getRegistrationDate());
 
