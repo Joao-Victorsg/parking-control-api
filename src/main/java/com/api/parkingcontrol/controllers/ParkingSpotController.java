@@ -1,8 +1,11 @@
 package com.api.parkingcontrol.controllers;
 
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
+import com.api.parkingcontrol.models.CarModel;
 import com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.models.ResponsibleModel;
 import com.api.parkingcontrol.services.ParkingSpotService;
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class ParkingSpotController {
 
      final ParkingSpotService parkingSpotService;
+     private Mapper mapper;
 
 
     public ParkingSpotController(ParkingSpotService parkingSpotService) {
@@ -40,7 +43,15 @@ public class ParkingSpotController {
         if (CONFLICT != null) return CONFLICT;
 
         var parkingSpotModel = new ParkingSpotModel();
+        var carModel = new CarModel();
+        var responsibleModel = new ResponsibleModel();
+
+        BeanUtils.copyProperties(parkingSpotDto, carModel);
+        BeanUtils.copyProperties(parkingSpotDto, responsibleModel);
         BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel); //Converting the DTO in Model
+        parkingSpotModel.setCarModel(carModel);
+        parkingSpotModel.setResponsibleModel(responsibleModel);
+
         parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
         return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
     }
@@ -71,7 +82,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
     }
 
-    @DeleteMapping("{/id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
         if(!parkingSpotModelOptional.isPresent())
@@ -81,7 +92,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body("Parking Spot deleted successfully.");
     }
 
-    @PutMapping("{/id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
                                                     @RequestBody @Valid ParkingSpotDto parkingSpotDto){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
@@ -90,6 +101,9 @@ public class ParkingSpotController {
 
         var parkingSpotModel = parkingSpotModelOptional.get();
         BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel);
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel.getCarModel());
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel.getResponsibleModel());
+
         parkingSpotModel.setId(parkingSpotModelOptional.get().getId());
         parkingSpotModel.setRegistrationDate(parkingSpotModelOptional.get().getRegistrationDate());
 

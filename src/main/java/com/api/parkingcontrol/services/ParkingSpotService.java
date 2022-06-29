@@ -1,13 +1,14 @@
 package com.api.parkingcontrol.services;
 
 import com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.repositories.CarModelRepository;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
+import com.api.parkingcontrol.repositories.ResponsibleModelRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,9 +18,14 @@ public class ParkingSpotService {
     // Controller -> Service -> Repository
 
     final ParkingSpotRepository parkingSpotRepository;
+    final CarModelRepository carModelRepository;
+    final ResponsibleModelRepository responsibleModelRepository;
 
-    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository) {
+    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository, CarModelRepository carModelRepository,
+                              ResponsibleModelRepository responsibleModelRepository) {
         this.parkingSpotRepository = parkingSpotRepository;
+        this.carModelRepository = carModelRepository;
+        this.responsibleModelRepository = responsibleModelRepository;
     }
 
     @Transactional
@@ -28,16 +34,15 @@ public class ParkingSpotService {
     }
 
     public boolean existsByLicensePlateCar(String licensePlateCar) {
-        return parkingSpotRepository.existsByLicensePlateCar(licensePlateCar);
+        return carModelRepository.existsByLicensePlateCar(licensePlateCar);
     }
 
     public boolean existsByParkingSpotNumber(String parkingSpotNumber) {
         return parkingSpotRepository.existsByParkingSpotNumber(parkingSpotNumber);
     }
 
-
     public boolean existsByApartmentAndBlock(String apartment, String block) {
-        return parkingSpotRepository.existsByApartmentAndBlock(apartment,block);
+        return responsibleModelRepository.existsByApartmentAndBlock(apartment,block);
     }
 
     public Page<ParkingSpotModel> findall(Pageable pageable) {
