@@ -1,8 +1,6 @@
 package com.api.parkingcontrol.models;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "TB_CARMODEL")
-@Data
+@NoArgsConstructor
 public class CarModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,4 +26,11 @@ public class CarModel implements Serializable {
     private String modelCar;
     @Column(nullable = false,length = 70)
     private String colorCar;
+
+    public CarModel(String licensePlateCar, String brandCar, String modelCar, String colorCar) {
+        this.licensePlateCar = licensePlateCar;
+        this.brandCar = brandCar;
+        this.modelCar = modelCar;
+        this.colorCar = colorCar;
+    }
 }

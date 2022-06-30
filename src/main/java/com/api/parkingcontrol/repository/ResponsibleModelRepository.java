@@ -1,4 +1,4 @@
-package com.api.parkingcontrol.repositories;
+package com.api.parkingcontrol.repository;
 
 import com.api.parkingcontrol.models.ResponsibleModel;
 import org.springframework.data.jpa.repository.JpaRepository;
