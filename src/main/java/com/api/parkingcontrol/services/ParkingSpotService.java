@@ -1,9 +1,9 @@
 package com.api.parkingcontrol.services;
 
 import com.api.parkingcontrol.models.ParkingSpotModel;
-import com.api.parkingcontrol.repositories.CarModelRepository;
-import com.api.parkingcontrol.repositories.ParkingSpotRepository;
-import com.api.parkingcontrol.repositories.ResponsibleModelRepository;
+import com.api.parkingcontrol.repository.CarModelRepository;
+import com.api.parkingcontrol.repository.ParkingSpotRepository;
+import com.api.parkingcontrol.repository.ResponsibleModelRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ParkingSpotService {
+public class ParkingSpotService{
 
     // Controller -> Service -> Repository
 

@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @Data
-public class ParkingSpotDto {
+public class ParkingSpotDtoRequest {
 
     @NotBlank
     private String parkingSpotNumber;

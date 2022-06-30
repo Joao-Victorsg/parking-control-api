@@ -2,6 +2,7 @@ package com.api.parkingcontrol.models;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Setter
 @Data
 @Table(name = "TB_RESPONSIBLEMODEL")
+@NoArgsConstructor
 public class ResponsibleModel implements Serializable{
 
     private static final long serialVersionUID = 1L;
@@ -26,4 +28,10 @@ public class ResponsibleModel implements Serializable{
     private String apartment;
     @Column(nullable = false, length = 30)
     private String block;
+
+    public ResponsibleModel(String responsibleName, String apartment, String block) {
+        this.responsibleName = responsibleName;
+        this.apartment = apartment;
+        this.block = block;
+    }
 }
