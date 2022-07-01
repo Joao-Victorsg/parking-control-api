@@ -3,36 +3,41 @@ package com.api.parkingcontrol.controllers;
 import com.api.parkingcontrol.dtos.ParkingSpotDtoRequest;
 import com.api.parkingcontrol.dtos.ParkingSpotDtoResponse;
 import com.api.parkingcontrol.mappers.ParkingSpotMapper;
-import com.api.parkingcontrol.models.CarModel;
 import com.api.parkingcontrol.models.ParkingSpotModel;
-import com.api.parkingcontrol.models.ResponsibleModel;
-import com.api.parkingcontrol.services.ParkingSpotService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.api.parkingcontrol.services.car.CarService;
+import com.api.parkingcontrol.services.car.impl.CarServiceImpl;
+import com.api.parkingcontrol.services.parkingspot.ParkingSpotService;
+import com.api.parkingcontrol.services.parkingspot.impl.ParkingSpotServiceImpl;
+import com.api.parkingcontrol.services.responsible.ResponsibleService;
+import com.api.parkingcontrol.services.responsible.impl.ResponsibleServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/parking-spot")
 public class ParkingSpotController {
 
-     final ParkingSpotService parkingSpotService;
+     private ParkingSpotService parkingSpotService;
+     private CarService carService;
+     private ResponsibleService responsibleService;
      private final ParkingSpotMapper mapper;
 
-
-    public ParkingSpotController(ParkingSpotService parkingSpotService, ParkingSpotMapper mapper) {
+    @Autowired
+    public ParkingSpotController(ParkingSpotService parkingSpotService, CarService carService,
+                                 ResponsibleService responsibleService, ParkingSpotMapper mapper) {
         this.parkingSpotService = parkingSpotService;
+        this.carService = carService;
+        this.responsibleService = responsibleService;
         this.mapper = mapper;
     }
 
@@ -53,22 +58,43 @@ public class ParkingSpotController {
     }
 
     private ResponseEntity<Object> verifyIfAlreadyInUseOrRegistered(ParkingSpotDtoRequest parkingSpotDto) {
-        if(parkingSpotService.existsByLicensePlateCar(parkingSpotDto.getLicensePlateCar()))
+        if(carService.existsByLicensePlateCar(parkingSpotDto.getLicensePlateCar()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: License Plate Car is already in use!");
 
         if(parkingSpotService.existsByParkingSpotNumber(parkingSpotDto.getParkingSpotNumber()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Spot is already in use!");
 
-        if(parkingSpotService.existsByApartmentAndBlock(parkingSpotDto.getApartment(), parkingSpotDto.getBlock()))
+        if(responsibleService.existsByApartmentAndBlock(parkingSpotDto.getApartment(), parkingSpotDto.getBlock()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Spot already registered for " +
                     "this apartment/block!");
         return null;
     }
 
     @GetMapping
-    public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpots(@PageableDefault(page = 0, size=10, sort="id",
-            direction = Sort.Direction.ASC) Pageable pageable){
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findall(pageable));
+    public ResponseEntity<Page<ParkingSpotDtoResponse>> getAllParkingSpots(@PageableDefault(page = 0, size=10, sort="id",
+            direction = Sort.Direction.ASC) Pageable pageable, @RequestParam Optional<String> block){
+
+        if(block.isPresent()){
+
+            Page<ParkingSpotDtoResponse> response = convertModelToDtoResponse(parkingSpotService.
+                    findByResponsibleModelBlock(pageable,block.get())
+            );
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        Page<ParkingSpotDtoResponse> response = convertModelToDtoResponse(parkingSpotService.findall(pageable));
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public PageImpl<ParkingSpotDtoResponse> convertModelToDtoResponse(Page<ParkingSpotModel> result){
+
+        return new PageImpl<>(
+                result.stream().
+                map(item -> mapper.toParkingSpotDtoResponse(item)).
+                collect(Collectors.toList())
+        );
     }
 
     @GetMapping("/{id}")

@@ -1,9 +1,9 @@
-package com.api.parkingcontrol.services;
+package com.api.parkingcontrol.services.parkingspot.impl;
 
 import com.api.parkingcontrol.models.ParkingSpotModel;
-import com.api.parkingcontrol.repository.CarModelRepository;
 import com.api.parkingcontrol.repository.ParkingSpotRepository;
-import com.api.parkingcontrol.repository.ResponsibleModelRepository;
+import com.api.parkingcontrol.services.parkingspot.ParkingSpotService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,42 +13,34 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ParkingSpotService{
+public class ParkingSpotServiceImpl implements ParkingSpotService {
 
     // Controller -> Service -> Repository
 
-    final ParkingSpotRepository parkingSpotRepository;
-    final CarModelRepository carModelRepository;
-    final ResponsibleModelRepository responsibleModelRepository;
+    @Autowired
+    private ParkingSpotRepository parkingSpotRepository;
 
-    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository, CarModelRepository carModelRepository,
-                              ResponsibleModelRepository responsibleModelRepository) {
-        this.parkingSpotRepository = parkingSpotRepository;
-        this.carModelRepository = carModelRepository;
-        this.responsibleModelRepository = responsibleModelRepository;
-    }
-
-    @Transactional
+    @Override
     public ParkingSpotModel save(ParkingSpotModel parkingSpotModel) {
         return parkingSpotRepository.save(parkingSpotModel);
     }
 
-    public boolean existsByLicensePlateCar(String licensePlateCar) {
-        return carModelRepository.existsByLicensePlateCar(licensePlateCar);
-    }
-
+    @Override
     public boolean existsByParkingSpotNumber(String parkingSpotNumber) {
         return parkingSpotRepository.existsByParkingSpotNumber(parkingSpotNumber);
     }
 
-    public boolean existsByApartmentAndBlock(String apartment, String block) {
-        return responsibleModelRepository.existsByApartmentAndBlock(apartment,block);
-    }
-
+    @Override
     public Page<ParkingSpotModel> findall(Pageable pageable) {
         return parkingSpotRepository.findAll(pageable);
     }
 
+    @Override
+    public Page<ParkingSpotModel> findByResponsibleModelBlock(Pageable pageable, String block){
+        return parkingSpotRepository.findByResponsibleModelBlock(pageable,block);
+    }
+
+    @Override
     public Optional<ParkingSpotModel> findById(UUID id) {
         return parkingSpotRepository.findById(id);
     }
