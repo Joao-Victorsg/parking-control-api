@@ -11,16 +11,18 @@ import java.util.UUID;
 public interface ParkingSpotService {
 
     @Transactional
-    public ParkingSpotModel save(ParkingSpotModel parkingSpotModel);
+    ParkingSpotModel save(ParkingSpotModel parkingSpotModel);
 
-    public Optional<ParkingSpotModel> findById(UUID id);
+    Optional<ParkingSpotModel> findById(UUID id);
 
-    public boolean existsByParkingSpotNumber(String parkingSpotNumber);
+    boolean existsByParkingSpotNumber(String parkingSpotNumber);
 
-    public Page<ParkingSpotModel> findall(Pageable pageable);
+    Page<ParkingSpotModel> findall(Pageable pageable);
 
-    public Page<ParkingSpotModel> findByResponsibleModelBlock(Pageable pageable, String block);
+    Page<ParkingSpotModel> findByResponsibleModelBlock(Pageable pageable, String block);
 
     @Transactional
-    public void delete(ParkingSpotModel parkingSpotModel);
+    void delete(ParkingSpotModel parkingSpotModel);
+
+    Optional<ParkingSpotModel> findByParkingSpotNumber(String parkingSpotNumber);
 }

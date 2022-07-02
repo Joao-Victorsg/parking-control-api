@@ -5,11 +5,11 @@ import com.api.parkingcontrol.dtos.ParkingSpotDtoResponse;
 import com.api.parkingcontrol.mappers.ParkingSpotMapper;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.services.car.CarService;
-import com.api.parkingcontrol.services.car.impl.CarServiceImpl;
 import com.api.parkingcontrol.services.parkingspot.ParkingSpotService;
-import com.api.parkingcontrol.services.parkingspot.impl.ParkingSpotServiceImpl;
 import com.api.parkingcontrol.services.responsible.ResponsibleService;
-import com.api.parkingcontrol.services.responsible.impl.ResponsibleServiceImpl;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -41,7 +41,8 @@ public class ParkingSpotController {
         this.mapper = mapper;
     }
 
-    @PostMapping
+    @ApiOperation("Save one parking spot")
+    @PostMapping(produces = "application/json")
     // The @Valid notation is used to do the validations that are setted up in the DTO.
     // The @RequestBody is used to define the fields of the request.
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDtoRequest parkingSpotDto){
@@ -70,9 +71,14 @@ public class ParkingSpotController {
         return null;
     }
 
-    @GetMapping
+    @ApiOperation("Return a list of parking spots")
+    @ApiResponses(value={
+        @ApiResponse(responseCode = "200", description = "Return a list of parking spots"),
+        @ApiResponse(responseCode = "404", description = "No parking spots found to this block or there aren't any parking spot registered"),
+    })
+    @GetMapping(produces = "application/json")
     public ResponseEntity<Page<ParkingSpotDtoResponse>> getAllParkingSpots(@PageableDefault(page = 0, size=10, sort="id",
-            direction = Sort.Direction.ASC) Pageable pageable, @RequestParam Optional<String> block){
+            direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) Optional<String> block){
 
         if(block.isPresent()){
 
@@ -97,7 +103,8 @@ public class ParkingSpotController {
         );
     }
 
-    @GetMapping("/{id}")
+    @ApiOperation("Get one parking Spot by id")
+    @GetMapping(path = "/{id}",produces = "application/json")
     public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id") UUID id){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
         if(!parkingSpotModelOptional.isPresent())
@@ -106,7 +113,17 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @ApiOperation("Get one parking Spot by parking spot number")
+    @GetMapping(path ="/number/{parkingSpotNumber}",produces = "application/json")
+    public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "parkingSpotNumber") String parkingSpotNumber){
+        Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findByParkingSpotNumber(parkingSpotNumber);
+        if(!parkingSpotModelOptional.isPresent())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found.");
+        var response = mapper.toParkingSpotDtoResponse(parkingSpotModelOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(path ="/{id}",produces = "application/json")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
         if(!parkingSpotModelOptional.isPresent())
@@ -116,7 +133,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body("Parking Spot deleted successfully.");
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path ="/{id}",produces = "application/json")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
                                                     @RequestBody @Valid ParkingSpotDtoRequest parkingSpotDto){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);

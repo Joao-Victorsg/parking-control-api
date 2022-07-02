@@ -50,4 +50,9 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
     public void delete(ParkingSpotModel parkingSpotModel) {
         parkingSpotRepository.delete(parkingSpotModel);
     }
+
+    @Override
+    public Optional<ParkingSpotModel> findByParkingSpotNumber(String parkingSpotNumber) {
+        return parkingSpotRepository.findByParkingSpotNumber(parkingSpotNumber);
+    }
 }
